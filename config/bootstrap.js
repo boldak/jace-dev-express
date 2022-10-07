@@ -8,6 +8,8 @@ const passport = require('passport')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 const { extend } = require("lodash")
+const YAML = require("js-yaml")
+
 
 const config = require("./index")
 const STATIC_FILE_PATTERN = /\.[^.\/]*$/g
@@ -84,9 +86,23 @@ let checkDefaultAdmins = () => Promise.all( config.portal.administrators.map( ad
     })
 })))  
 
+const getEnv = () => {
+  const keys = ["APP_HOST", "APP_PROTOCOL","GOOGLE_CALLBACK","MONGO_URI"]
+  let res = {}
+  keys.forEach( key => {
+    res[key] = process.env[key]
+  })
+  return res
+}
+
 
 let configureServer = () => {
   console.log("** Starts portal configuration")
+  console.log("** Environment Variables **")
+  console.table(getEnv())
+  console.log("** Configutarion **")
+  console.log(YAML.dump(JSON.parse(JSON.stringify(config))))
+  
   return checkDefaultAdmins()
     .then( () => addDefaultAppConfigs())
     .then( () => addDefaultPortalConfigs())
