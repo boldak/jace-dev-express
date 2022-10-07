@@ -45,6 +45,12 @@ let requestHandler = (req, res, next) => {
                         .populate('owner') //
                 })
                 .then(app => {
+
+                    if(!app){
+                        res.sendStatus(404)
+                        return
+                    }
+
                     AppConfig.destringifyConfigs(app)
 
 

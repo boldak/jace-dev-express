@@ -40,6 +40,7 @@ let addDefaultAppConfigs = ()  => {
 
 let addDefaultPortalConfigs = ()  => PortalConfig.findOne({})
   .then( config => {
+    console.log("CONFIG",config)
     let data = extend(
       {},
       (config) ? config.value : {}, 
@@ -48,6 +49,7 @@ let addDefaultPortalConfigs = ()  => PortalConfig.findOne({})
         pubService:"http://localhost:8081"
       }
     )
+    console.log("LOAD\n"+YAML.dump(data))
     return data
   })
   .then( config => PortalConfig.findOrCreate({}, {value:config})
