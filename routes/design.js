@@ -12,6 +12,140 @@ let PortalConfig = require("../models/PortalConfig")
 
 
 
+// const handler = async (req, res, next) => {
+//     let portal
+    
+//     let data = await fs.readFile(path.resolve(config.portal.indexPath)) 
+
+//     let page = data.toString()
+//     let defaultApp
+
+//     let cookie = (req.headers.cookie) 
+//         ? zipObject(
+//             req.headers.cookie.split(";").map(d => {
+//                 let r = d.split("=")
+//                 return [r[0].trim(), r[1]]
+//             })
+//         ) 
+//         : {}
+
+//     let config = await PortalConfig.find({})
+//     portal = {
+//         config: config[0].value
+//     }
+//     defaultApp = config[0].value.defaultApp
+    
+//     let app = await AppConfig
+//         .findOne({name: req.params.appName || defaultApp})
+//         .populate('owner') 
+
+
+//     if(!app){
+//         res.sendStatus(404)
+//         return
+//     }
+
+//     AppConfig.destringifyConfigs(app)
+
+//     let userInfo = extend(
+//         (req.user) 
+//             ?   {
+//                   _id: req.user._id,                                                                                                         
+//                   email: req.user.email,                                                                                                      
+//                   name: req.user.name,                                                                                                                 
+//                   photo: req.user.photo,                                     
+//                   createdAt: req.user.createdAt,                                                                                                   
+//                   updatedAt: req.user.updatedAt,                                                                                                   
+//                   isAdmin: req.user.isAdmin  
+//                 }
+//             :   {},
+//             {
+//                 isLoggedIn: !isUndefined(req.user),
+//                 isOwner: AppConfig.isOwner(app, req.user),
+//                 isCollaborator: AppConfig.isCollaborator(app, req.user)
+//             }
+//     )
+
+//     app.defaultApp = defaultApp;
+    
+//     let config = {
+//         app: app,
+//         appMode: cookie[`${app.id}-mode`],
+//         userInfo: userInfo,
+//         ownerInfo: !app.owner ? {
+//             exists: false
+//         } : {
+//             id: app.owner.id,
+//             name: app.owner.name,
+//             email: app.owner.email,
+//             photo: app.owner.photo,
+//             exists: true
+//         },
+//         publicAppConfig: {
+//             id: app.id,
+
+//             instance: `${app.name}_${Math.random().toString(36).substring(2)}`,
+//             name: app.name,
+//             devService: portal,
+
+//             user: userInfo,
+
+//             author: !app.owner ? {
+//                 exists: false
+//             } : {
+//                 id: app.owner.id,
+//                 name: app.owner.name,
+//                 email: app.owner.email,
+//                 photo: app.owner.photo,
+//                 exists: true
+//             },
+//             collaborations: app.collaborations || [],
+
+//             skin: app.skin || {
+//                 holders: {
+//                     AppHeader: { widgets: [] },
+//                     AppFooter: { widgets: [] }
+//                 }
+//             },
+
+//             pages: app.pages || [],
+//             clientOptions: app.clientOptions || null,
+//             theme: app.theme,
+//             icon: app.icon,
+//             i18n: app.i18n,
+//             title: app.title,
+//             description: app.description,
+//             keywords: app.keywords,
+//             dpsURL: app.dpsURL || "",
+//             isPublished: app.isPublished
+//         }
+//     }
+
+
+//     let script = `
+//           var devService =  ${JSON.stringify(config.publicAppConfig.devService)}
+//           var user = ${JSON.stringify(config.userInfo)};
+//           var author = ${JSON.stringify(config.ownerInfo)};
+//           var appName = "${config.app.name}";
+//           var initialConfig = JSON.parse(decodeURIComponent("${encodeURIComponent(JSON.stringify(config.publicAppConfig))}"));
+//           var dpsURL = initialConfig.dpsURL;
+//           var __application_Config_Key =  "${config.publicAppConfig.id}-application-config";
+//           var __application_Mode_Key =  "${config.publicAppConfig.id}-mode";
+//           sessionStorage.setItem(__application_Config_Key, JSON.stringify(initialConfig))
+
+//     `
+
+
+//     res.send(
+//         page
+//         .replace("//author", config.ownerInfo.name)
+//         .replace("//description", config.app.description)
+//         .replace("//__appconfig", script)
+//         .replace("//appTitle", config.app.title)
+//     )
+
+// }  
+
 
 let requestHandler = (req, res, next) => {
 	
@@ -181,6 +315,8 @@ let requestHandler = (req, res, next) => {
 
                     res.send(
                         page
+                        .replace("//author", config.ownerInfo.name)
+                        .replace("//description", config.app.description)
                         .replace("//__appconfig", script)
                         .replace("//appTitle", config.app.title)
                     )
